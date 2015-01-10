@@ -4,9 +4,12 @@ require 'spec_helper'
 describe SparkCore do
   
   describe "#devices" do
+    context ""
   end
 
   describe "#device_info" do
+    it "" do
+    end
   end
 
   describe "#spark_variable" do
