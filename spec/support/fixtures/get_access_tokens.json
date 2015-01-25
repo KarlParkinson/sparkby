@@ -1,0 +1,12 @@
+[
+    {
+	"token": "access_token_1",
+	"expires_at": "expiry_time_1",
+	"client": "spark"
+    },
+    {
+	"token": "access_token_2",
+	"expires_at": "expiry_time_2",
+	"client": "spark-ide"
+    }
+]

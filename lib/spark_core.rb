@@ -34,17 +34,12 @@ class SparkCore
   
   def get(url, basic_auth = {})
     response = self.class.get(url, :headers => {"Authorization" => "Bearer #{@access_token}"}, :basic_auth => basic_auth)
-#    puts response.code
     response
   end
 
   def post(url, params, basic_auth = {})
-#    puts url
     response = self.class.post(url, :headers => {"Authorization" => "Bearer #{@access_token}"}, :basic_auth => basic_auth, :body => {'params' => params})
     response
-  end
-
-  def put
   end
 
 end

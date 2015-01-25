@@ -1,12 +1,30 @@
 require 'sinatra/base'
 
 class FakeSparkApi < Sinatra::Base
+
+  helpers do
+    def protected!
+      return if authorized?
+      headers['WWW-Authenticate'] = 'Basic realm="Restricted Area"'
+      if @auth.credentials == ['valid_email', 'wrong_password']
+        halt 401, {'Content-Type' => 'text/json'}, File.open(File.dirname(__FILE__) + '/fixtures/invalid_password_access_tokens.json', 'rb').read
+      elsif @auth.credentials == ['invalid_email', 'correct_password']
+        halt 401, {'Content-Type' => 'text/json'}, File.open(File.dirname(__FILE__) + '/fixtures/invalid_email_access_tokens.json', 'rb').read
+      end
+    end
+
+    def authorized?
+      @auth ||= Rack::Auth::Basic::Request.new(request.env)
+      @auth.provided? and @auth.basic? and @auth.credentials and @auth.credentials == ['valid_email', 'correct_password']
+    end
+  end
   
   get '/v1/devices' do
     json_response 200, 'devices.json'
   end
 
   get '/v1/devices/:id' do
+    #puts request.to_yaml
     json_response 200, 'device_info.json'
   end
 
@@ -27,7 +45,8 @@ class FakeSparkApi < Sinatra::Base
   end
 
   get '/v1/access_tokens' do
-    puts headers
+    protected!
+    json_response 200, 'get_access_tokens.json'
   end
 
   private
