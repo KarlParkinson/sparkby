@@ -1,0 +1,11 @@
+{
+    "cmd": "VarReturn",
+    "name": "valid_variable_name",
+    "result": 42,
+    "coreInfo": {
+	"last_app": "",
+	"last_heard": "2014-08-22T22:33:25.4072",
+	"connected": true,
+	"deviceID": "4fdfrt56d"
+    }
+}

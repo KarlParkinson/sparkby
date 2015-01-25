@@ -1,0 +1,6 @@
+{
+    "id": "access_id",
+    "name": "core_name",
+    "connected": "true/false",
+    "return_value": "function_return_value"
+}

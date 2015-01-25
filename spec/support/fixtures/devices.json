@@ -1,0 +1,16 @@
+[
+    {
+        "id": "core_id1",
+        "name": "core_name1",
+        "last_app": "last_app_name",
+        "last_heard": "last_heard_time",
+        "connected": "true/false"
+    },
+    {
+        "id": "core_id2",
+        "name": "core_name2",
+        "last_app": "last_app_name",
+        "last_heard": "last_heard_time",
+        "connected": "true/false"
+    }
+]

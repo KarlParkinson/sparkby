@@ -1,0 +1,8 @@
+{
+    "id": "core_id",
+    "name": "core_name",
+    "connected": "true/false",
+    "variables": {},
+    "functions": [],
+    "cc3000_patch_version": "version"
+}
