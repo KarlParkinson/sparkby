@@ -121,16 +121,43 @@ describe SparkCore do
 
         context "expiration arg provided" do
           let(:expires_in) { 33600 }
+          let(:expires_at) { "2020-01-01" }
 
-          it "returns a new access_token that expires when specified" do
+          it  "returns a new access_token that expires_in when specified" do
             response = core.gen_access_token email, password, expires_in
             expect(response["expires_in"]).to eq expires_in
           end
 
+          it "returns a new access_token that expires_at when specified" do
+            response = core.gen_access_token email, password, nil, expires_at
+            expect(response["expires_at"]).to eq expires_at
+          end
         end
       end
-    end
 
+      context "valid email, invalid password" do
+        let(:email) {'valid_email'}
+        let(:password) {'wrong_password'}
+     
+        it "returns 'User credentials are invalid' in the response" do
+          response = core.gen_access_token email, password
+          expect(response["error_description"]).to eq "User credentials are invalid"
+        end
+
+      end
+
+      context "invalid email, valid password" do
+        let(:email) {'invalid_email'}
+        let(:password) {'correct_password'}
+        
+        it "returns 'User credentials are invalid' in the response" do
+          response = core.gen_access_token email, password
+          expect(response["error_description"]).to eq "User credentials are invalid"
+        end
+
+      end
+    end
+      
     describe "#del_access_token" do
       let(:token) { "23456hty78" }
 

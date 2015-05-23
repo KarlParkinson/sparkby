@@ -21,7 +21,7 @@ class FakeSparkApi < Sinatra::Base
 
     def check_username_and_password_in_body(body)
       args = JSON.parse(body.read)
-      if args["username"] != 'valid_email' and args["password"] != 'correct_password'
+      if args["username"] != 'valid_email' or args["password"] != 'correct_password'
         halt 401, {'Content-Type' => 'text/json'}, File.open(File.dirname(__FILE__) + '/fixtures/invalid_email_password_combo.json', 'rb').read
       end
     end
@@ -61,7 +61,9 @@ class FakeSparkApi < Sinatra::Base
     request.body.rewind
     args = JSON.parse(request.body.read)
     if args.has_key?("expires_in")
-      json_response 200, 'gen_access_token_expiry.json'
+      json_response 200, 'gen_access_token_expires_in.json'
+    elsif args.has_key?("expires_at")
+      json_response 200, 'gen_access_token_expires_at.json'
     else
       json_response 200, 'gen_access_token_no_expiry.json'
     end

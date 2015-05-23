@@ -32,8 +32,9 @@ class SparkCore
     get '/v1/access_tokens', {:username => email, :password => password}
   end
 
-  def gen_access_token(email, password, expires_in = nil)
-    post '/oauth/token', {:grant_type => 'password', :username => email, :password => password, :expires_in => expires_in}.reject{ |k,v| v.nil?}, {:id => 'particle', :password => 'particle'}
+  def gen_access_token(email, password, expires_in = nil, expires_at = nil)
+    post_oauth '/oauth/token', {:grant_type => 'password', :username => email, :password => password,
+      :expires_in => expires_in, :expires_at => expires_at}.reject{ |k,v| v.nil?}, {:id => 'particle', :password => 'particle'}
   end
 
   def del_access_token(email, password, token)
@@ -50,6 +51,10 @@ class SparkCore
   def post(url, body, basic_auth = nil)
     response = self.class.post(url, :headers => {"Authorization" => "Bearer #{@access_token}"}, :basic_auth => basic_auth, :body => body.to_json)
     response
+  end
+
+  def post_oauth(url, body, basic_auth = nil)
+    response = self.class.post(url, :basic_auth => basic_auth, :body => body.to_json)
   end
 
   def delete(url, basic_auth = nil)
