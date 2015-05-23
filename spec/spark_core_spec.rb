@@ -1,6 +1,5 @@
 require 'spec_helper'
 
-
 describe SparkCore do
   context "valid_access_token and device_id" do
     let(:core) {SparkCore.new 'valid_access_token', 'valid_device_id'}
@@ -103,6 +102,69 @@ describe SparkCore do
         end
       end
       
+    end
+
+    describe "#gen_access_token" do
+      context "valid email and password" do
+        let(:email) {'valid_email'}
+        let(:password) {'correct_password'}
+        
+        context "no expiration arg provided" do
+
+          it "returns a new access_token in the 'access_token' field" do
+            response = core.gen_access_token email, password
+            expect(response).to include 'access_token'
+            expect(response["access_token"]).to_not be_nil
+          end
+
+        end
+
+        context "expiration arg provided" do
+          let(:expires_in) { 33600 }
+
+          it "returns a new access_token that expires when specified" do
+            response = core.gen_access_token email, password, expires_in
+            expect(response["expires_in"]).to eq expires_in
+          end
+
+        end
+      end
+    end
+
+    describe "#del_access_token" do
+      let(:token) { "23456hty78" }
+
+      context "valid email and password" do
+        let(:email) {'valid_email'}
+        let(:password) {'correct_password'}
+
+        it "responds with the 'ok' field as true" do
+          response = core.del_access_token email, password, token
+          expect(response["ok"]).to be true
+        end
+
+      end
+
+      context "valid email, invalid password" do
+        let(:email) {'valid_email'}
+        let(:password) {'wrong_password'}
+        
+        it "should return 'Bad password' in the 'errors' field" do
+          response = core.del_access_token email, password, token
+          expect(response["errors"].pop).to eq "Bad password"
+        end
+
+      end
+
+      context "invalid email, valid password" do
+        let(:email) {'invalid_email'}
+        let(:password) {'correct_password'}
+
+        it "should return 'Unknown user' in the 'errors' field" do
+          response = core.del_access_token email, password, token
+          expect(response["errors"].pop).to eq "Unknown user"
+        end
+      end
     end
   end
 end

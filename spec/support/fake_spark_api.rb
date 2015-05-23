@@ -1,3 +1,4 @@
+require 'json'
 require 'sinatra/base'
 
 class FakeSparkApi < Sinatra::Base
@@ -17,6 +18,13 @@ class FakeSparkApi < Sinatra::Base
       @auth ||= Rack::Auth::Basic::Request.new(request.env)
       @auth.provided? and @auth.basic? and @auth.credentials and @auth.credentials == ['valid_email', 'correct_password']
     end
+
+    def check_username_and_password_in_body(body)
+      args = JSON.parse(body.read)
+      if args["username"] != 'valid_email' and args["password"] != 'correct_password'
+        halt 401, {'Content-Type' => 'text/json'}, File.open(File.dirname(__FILE__) + '/fixtures/invalid_email_password_combo.json', 'rb').read
+      end
+    end
   end
   
   get '/v1/devices' do
@@ -24,7 +32,6 @@ class FakeSparkApi < Sinatra::Base
   end
 
   get '/v1/devices/:id' do
-    #puts request.to_yaml
     json_response 200, 'device_info.json'
   end
 
@@ -47,6 +54,22 @@ class FakeSparkApi < Sinatra::Base
   get '/v1/access_tokens' do
     protected!
     json_response 200, 'get_access_tokens.json'
+  end
+
+  post '/oauth/token' do
+    check_username_and_password_in_body(request.body)
+    request.body.rewind
+    args = JSON.parse(request.body.read)
+    if args.has_key?("expires_in")
+      json_response 200, 'gen_access_token_expiry.json'
+    else
+      json_response 200, 'gen_access_token_no_expiry.json'
+    end
+  end
+
+  delete '/v1/access_tokens/:token' do
+    protected!
+    json_response 200, 'delete_access_token.json'
   end
 
   private
