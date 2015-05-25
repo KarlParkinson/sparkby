@@ -57,6 +57,8 @@ class FakeSparkApi < Sinatra::Base
   end
 
   post '/oauth/token' do
+    puts request.body.read
+    request.body.rewind
     check_username_and_password_in_body(request.body)
     request.body.rewind
     args = JSON.parse(request.body.read)
