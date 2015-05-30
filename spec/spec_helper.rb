@@ -1,7 +1,7 @@
 require 'webmock/rspec'
 require 'json'
-require_relative '../lib/spark_core.rb'
-require_relative 'support/fake_spark_api.rb'
+require_relative '../lib/sparkby'
+require_relative 'support/fake_spark_api'
 
 WebMock.disable_net_connect!
 

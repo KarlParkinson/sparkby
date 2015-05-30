@@ -20,7 +20,7 @@ class FakeSparkApi < Sinatra::Base
     end
 
     def check_username_and_password_in_body(body)
-      args = JSON.parse(body.read)
+      args = Rack::Utils.parse_nested_query(body.read)
       if args["username"] != 'valid_email' or args["password"] != 'correct_password'
         halt 401, {'Content-Type' => 'text/json'}, File.open(File.dirname(__FILE__) + '/fixtures/invalid_email_password_combo.json', 'rb').read
       end
@@ -57,11 +57,9 @@ class FakeSparkApi < Sinatra::Base
   end
 
   post '/oauth/token' do
-    puts request.body.read
-    request.body.rewind
     check_username_and_password_in_body(request.body)
     request.body.rewind
-    args = JSON.parse(request.body.read)
+    args = Rack::Utils.parse_nested_query(request.body.read)
     if args.has_key?("expires_in")
       json_response 200, 'gen_access_token_expires_in.json'
     elsif args.has_key?("expires_at")

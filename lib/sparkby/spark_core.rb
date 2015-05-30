@@ -1,59 +1,60 @@
 require 'httparty'
 
-
 module Sparkby
+
+  # Main core driver. Exposes ability to read Spark variable,
+  # call Spark function, view device info, and view other
+  # devices.
   class SparkCore
     include HTTParty
     base_uri 'https://api.particle.io'
-
+    
+    # Particle API access token
     attr_accessor :access_token
+    # Device ID of Particle core
     attr_accessor :device_id
     
+    # ==== Arguments
+    # * +access_token+ - Particle API access token
+    # * +device_id+ - Device ID of Particle core
     def initialize(access_token, device_id)
       @access_token = access_token
       @device_id = device_id
     end
 
+    # View devices authenticated user has access to
     def devices
       get '/v1/devices'
     end
-
+    
+    # View information about device
     def device_info
       get '/v1/devices/' + @device_id
     end
 
+    # Read the value of a Spark variable
+    # ==== Arguments
+    # * +variable_name+ - Name of the Spark variable
     def spark_variable(variable_name)
       get '/v1/devices/' + @device_id + '/' + variable_name
     end
 
+    # Call a Spark function
+    # ==== Arguments
+    # * +function+ - Name of the Spark function
+    # * +args+ - Argument string to pass to Spark function
     def spark_function(function, args=nil)
       post '/v1/devices/' + @device_id + '/' + function, {'params' => args}
-    end
-
-    def access_tokens(email, password)
-      get '/v1/access_tokens', {:username => email, :password => password}
-    end
-
-    def gen_access_token(email, password, expires_in = nil, expires_at = nil, client_id = 'particle', client_secret = 'particle')
-      post_oauth '/oauth/token', {:grant_type => 'password', :username => email, :password => password,
-        :expires_in => expires_in, :expires_at => expires_at}.reject{ |k,v| v.nil?},
-      {:username => client_id, :password => client_secret}
-    end
-
-    def del_access_token(email, password, token)
-      delete '/v1/access_tokens/' + token, {:username => email, :password => password}
     end
 
     private
     
     def get(url, basic_auth = nil)
       response = self.class.get(url, :headers => {"Authorization" => "Bearer #{@access_token}"}, :basic_auth => basic_auth)
-      response
     end
 
     def post(url, body, basic_auth = nil)
-      response = self.class.post(url, :headers => {"Authorization" => "Bearer #{@access_token}"}, :basic_auth => basic_auth, :body => body.to_json)
-      response
+      response = self.class.post(url, :headers => {"Authorization" => "Bearer #{@access_token}"}, :basic_auth => basic_auth, :body => body)
     end
 
     def post_oauth(url, body, basic_auth = nil)
@@ -62,8 +63,8 @@ module Sparkby
 
     def delete(url, basic_auth = nil)
       response = self.class.delete(url, :basic_auth => basic_auth)
-      response
     end
 
   end
+
 end
