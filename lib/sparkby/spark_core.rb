@@ -1,4 +1,4 @@
-require 'httparty'
+require_relative 'http_caller'
 
 module Sparkby
 
@@ -6,8 +6,6 @@ module Sparkby
   # call Spark function, view device info, and view other
   # devices.
   class SparkCore
-    include HTTParty
-    base_uri 'https://api.particle.io'
     
     # Particle API access token
     attr_accessor :access_token
@@ -20,23 +18,25 @@ module Sparkby
     def initialize(access_token, device_id)
       @access_token = access_token
       @device_id = device_id
+      @http_caller = HTTPCaller.new
+      @header = {"Authorization" => "Bearer #{@access_token}"}
     end
 
     # View devices authenticated user has access to
     def devices
-      get '/v1/devices'
+      @http_caller.get '/v1/devices', @header
     end
     
     # View information about device
     def device_info
-      get '/v1/devices/' + @device_id
+      @http_caller.get '/v1/devices/' + @device_id, @header
     end
 
     # Read the value of a Spark variable
     # ==== Arguments
     # * +variable_name+ - Name of the Spark variable
     def spark_variable(variable_name)
-      get '/v1/devices/' + @device_id + '/' + variable_name
+      @http_caller.get '/v1/devices/' + @device_id + '/' + variable_name, @header
     end
 
     # Call a Spark function
@@ -44,27 +44,9 @@ module Sparkby
     # * +function+ - Name of the Spark function
     # * +args+ - Argument string to pass to Spark function
     def spark_function(function, args=nil)
-      post '/v1/devices/' + @device_id + '/' + function, {'params' => args}
+      @http_caller.post '/v1/devices/' + @device_id + '/' + function, {'params' => args}, nil, @header
     end
-
-    private
     
-    def get(url, basic_auth = nil)
-      response = self.class.get(url, :headers => {"Authorization" => "Bearer #{@access_token}"}, :basic_auth => basic_auth)
-    end
-
-    def post(url, body, basic_auth = nil)
-      response = self.class.post(url, :headers => {"Authorization" => "Bearer #{@access_token}"}, :basic_auth => basic_auth, :body => body)
-    end
-
-    def post_oauth(url, body, basic_auth = nil)
-      response = self.class.post(url, :basic_auth => basic_auth, :body => body)
-    end
-
-    def delete(url, basic_auth = nil)
-      response = self.class.delete(url, :basic_auth => basic_auth)
-    end
-
   end
 
 end
